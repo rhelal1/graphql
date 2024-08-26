@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Profile Page</title>
+    <link rel="stylesheet" href="profileStyles.css" />
+</head>
+
+<body>
+
+
+
+    <div class="container">
+
+        <span id="userNameHello">hello ! </span>
+        <div id="logout">
+            <span id="signOut">Sign-out >></span>
+        </div>
+
+        <div class="control block-cube box1">
+            <div class="bg-top">
+                <div class="bg-inner"></div>
+            </div>
+            <div class="bg-right">
+                <div class="bg-inner"></div>
+            </div>
+            <div class="bg">
+                <div class="bg-inner"></div>
+            </div>
+            <div class="profile">
+                <img src="user.svg" class="user-icon" alt="User Profile Image" />
+                <span id="userName"></span>
+            </div>
+            <div class="level">
+                <span id="level"></span>
+            </div>
+        </div>
+        <div class="boxes">
+            <div class="control block-cube box2">
+                <div class="ratio">
+                    <svg width="250" height="140" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Define the shadow and glow filters -->
+                            <defs>
+                                <!-- Shadow and glow filter for the top bar and text -->
+                                <filter id="glowTop" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur
+                                        in="SourceAlpha"
+                                        stdDeviation="4"
+                                        result="blur"
+                                    />
+                                    <feOffset dx="0" dy="0" result="offsetblur" />
+                                    <feFlood flood-color="#4e09bd" result="color" />
+                                    <feComposite in2="offsetblur" operator="in" />
+                                    <feMerge>
+                                        <feMergeNode />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+
+                                <!-- Shadow and glow filter for the bottom bar and text -->
+                                <filter
+                                    id="glowBottom"
+                                    x="-50%"
+                                    y="-50%"
+                                    width="200%"
+                                    height="200%"
+                                >
+                                    <feGaussianBlur
+                                        in="SourceAlpha"
+                                        stdDeviation="4"
+                                        result="blur"
+                                    />
+                                    <feOffset dx="0" dy="0" result="offsetblur" />
+                                    <feFlood flood-color="#0094B2" result="color" />
+                                    <feComposite in2="offsetblur" operator="in" />
+                                    <feMerge>
+                                        <feMergeNode />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            <!-- Top bar with its own shadow and glow effect -->
+                            <rect
+                                id="doneBar"
+                                x="0"
+                                y="20"
+                                height="10"
+                                fill="#4e09bd"
+                                filter="url(#glowTop)"
+                            />
+
+                            <!-- Text with shadow and glow effect for the top bar -->
+                            <text
+                                id="DoneRatio"
+                                y="20"
+                                fill="#8538ff"
+                                font-size="12"
+                                filter="url(#glowTop)"
+                            >
+                                <tspan id="doneValue" dy="0">Top Bar Info</tspan>
+                                <tspan id="doneText" dy="15">DONE</tspan>
+                            </text>
+
+                            <!-- Bottom bar with its own shadow and glow effect -->
+                            <rect
+                                id="receivedBar"
+                                x="0"
+                                y="50"
+                                height="10"
+                                fill="#00aeff"
+                                filter="url(#glowBottom)"
+                            />
+
+                            <!-- Text with shadow and glow effect for the bottom bar -->
+                            <text
+                                id="ReceivedRatio"
+                                x="180"
+                                y="50"
+                                fill="#00aeff"
+                                font-size="12"
+                                filter="url(#glowBottom)"
+                            >
+                                <tspan id="receivedValue" x="180" dy="0">Bottom Bar Info</tspan>
+                                <tspan id="receivedText" x="180" dy="15">RECEIVED</tspan>
+                            </text>
+
+                            <text
+                                id="Ratio"
+                                x="0"
+                                y="130"
+                                fill="#00d4ff"
+                                font-size="40"
+                                filter="url(#glowBottom)"
+                            >
+                                <tspan id="userRatio" x="0" dy="0">Bottom Bar Info</tspan>
+                                <tspan id="userMessage" font-size="15" x="75" dy="0">
+                                    Bottom Bar Info
+                                </tspan>
+                            </text>
+                        </svg>
+                </div>
+                <div class="bg-top">
+                    <div class="bg-inner"></div>
+                </div>
+                <div class="bg-right">
+                    <div class="bg-inner"></div>
+                </div>
+                <div class="bg">
+                    <div class="bg-inner"></div>
+                </div>
+            </div>
+            <div class="control block-cube box5">
+                <div class="xp" id="xpElement">
+                    <div id="lastProjects"></div>
+                    <span id="totalXP"></span>
+                </div>
+                <div class="bg-top">
+                    <div class="bg-inner"></div>
+                </div>
+                <div class="bg-right">
+                    <div class="bg-inner"></div>
+                </div>
+                <div class="bg">
+                    <div class="bg-inner"></div>
+                </div>
+            </div>
+        </div>
+        <div class="control block-cube box3">
+            <div class="pieChartDiv">
+                <span id="chartTitle">
+                        audited <br />
+                        projects
+                    </span>
+                <br />
+                <br />
+                <svg id="pieChart" width="200" height="200" viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg"></svg>
+                <span id="tooltip"></span>
+            </div>
+
+            <div class="bg-top">
+                <div class="bg-inner"></div>
+            </div>
+            <div class="bg-right">
+                <div class="bg-inner"></div>
+            </div>
+            <div class="bg">
+                <div class="bg-inner"></div>
+            </div>
+        </div>
+        <div class="control block-cube box4">
+            <div id="radarChartDiv">
+                <span id="chartTitle">
+                        <br />
+                        <br />
+                        BEST <br />
+                        skills
+                    </span>
+            </div>
+            <div class="bg-top">
+                <div class="bg-inner"></div>
+            </div>
+            <div class="bg-right">
+                <div class="bg-inner"></div>
+            </div>
+            <div class="bg">
+                <div class="bg-inner"></div>
+            </div>
+        </div>
+        <!-- <div class="control block-cube box3">
+                <div id="idkYet"></div>
+                <div class="bg-top">
+                    <div class="bg-inner"></div>
+                </div>
+                <div class="bg-right">
+                    <div class="bg-inner"></div>
+                </div>
+                <div class="bg">
+                    <div class="bg-inner"></div>
+                </div>
+            </div> -->
+    </div>
+    <!-- <script src="login.js"></script> -->
+    <script type="module" src="profile.js"></script>
+</body>
+
+</html>

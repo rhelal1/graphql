@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Sign In</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&amp;display=swap" />
+</head>
+
+<body>
+    <div class="container">
+        <form autocomplete="off" class="form" id="loginForm">
+            <div class="control">
+                <h1>Sign In</h1>
+            </div>
+            <div class="control block-cube block-input">
+                <input type="text" id="username" name="username" required placeholder="Username" />
+                <div class="bg-top">
+                    <div class="bg-inner"></div>
+                </div>
+                <div class="bg-right">
+                    <div class="bg-inner"></div>
+                </div>
+                <div class="bg">
+                    <div class="bg-inner"></div>
+                </div>
+            </div>
+            <div class="control block-cube block-input">
+                <input name="password" id="password" placeholder="Password" type="password" />
+                <div class="bg-top">
+                    <div class="bg-inner"></div>
+                </div>
+                <div class="bg-right">
+                    <div class="bg-inner"></div>
+                </div>
+                <div class="bg">
+                    <div class="bg-inner"></div>
+                </div>
+            </div>
+            <button class="btn block-cube block-cube-hover" type="submit">
+                    <div class="bg-top">
+                        <div class="bg-inner"></div>
+                    </div>
+                    <div class="bg-right">
+                        <div class="bg-inner"></div>
+                    </div>
+                    <div class="bg">
+                        <div class="bg-inner"></div>
+                    </div>
+                    <div class="text">Log In</div>
+                </button>
+        </form>
+        <p id="message"></p>
+    </div>
+    <script src="login.js"></script>
+</body>
+
+</html>
