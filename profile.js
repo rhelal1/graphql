@@ -96,20 +96,19 @@ const objectQuery = `
 // 5. User Details Query
 
 const userDetailsQuery = `
-  query GetUser {
-    user {
-      id
-      login
-      totalUp
-      totalDown
-      auditRatio
-    }
-    event_user(where: { userId: { _eq: $userId }, eventId:{_eq:20}}){
-      level
-      userAuditRatio
-    }
-  }
-`;
+       query GetUser($userId: Int!) {
+            user {
+                id
+                login
+                totalUp
+                totalDown
+             	auditRatio
+            }
+            event_user(where: { userId: { _eq: $userId }, eventId:{_eq:20}}){
+                level
+          		userAuditRatio
+            }
+        }`;
 
 // 6. Basic User Query
 
@@ -284,7 +283,7 @@ async function fetchData(query) {
 
 // to fetch the data
 async function fetchDataWVariable(query) {
-    const variables = {userId};
+    const variables = { userId };
     try {
         const response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
             method: "POST",
