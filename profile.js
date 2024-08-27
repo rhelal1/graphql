@@ -104,7 +104,7 @@ const userDetailsQuery = `
       totalDown
       auditRatio
     }
-    event_user(where: { eventId: { _eq: 20 } }) {
+    event_user(where: { userId: { _eq: $userId }, eventId:{_eq:20}}){
       level
       userAuditRatio
     }
@@ -168,13 +168,23 @@ async function start() {
         const userTransaction = await fetchData(userTransactionQuery);
         UserXp(userTransaction);
         hello(stats);
-        console.log(progress);
+        Projects(userTransaction);
         createRadarChart(skills, "radarChartDiv");
         // Call the function to display user information
         addAuditRatio(userData, transactionUpData.transaction);
         PieChart(generateSlices(createPathObject(transactionUpData.transaction)));
+        console.log(userData);
         const username = userData.user[0].login;
         const level = userData.event_user[0].level;
+        // Set the user icon based on gender
+        const userIcon = document.querySelector(".user-icon");
+        if (stats.user[0].attrs.gender === "Female") {
+            userIcon.src = "girl.png";
+        } else {
+            userIcon.src = "boy.png";
+        }
+        userIcon.classList.add("glow");
+
         document.getElementById("userName").innerHTML = username;
         document.getElementById("level").innerHTML = level;
     } catch (error) {
@@ -213,9 +223,6 @@ async function getUser() {
                 `,
             }),
         });
-
-        console.log(localStorage.getItem("jwtToken"));
-
         if (!response.ok) {
             throw new Error("Network response was not ok");
         }
@@ -241,6 +248,7 @@ async function getUser() {
 
 // to fetch the data
 async function fetchData(query) {
+    const variables = {userID};
     try {
         const response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
             method: "POST",
@@ -250,6 +258,7 @@ async function fetchData(query) {
             },
             body: JSON.stringify({
                 query,
+                variables
             }),
         });
 
@@ -343,33 +352,41 @@ function calculatePieSlicePath(cx, cy, radius, startAngle, ratio) {
 
     return pathData;
 }
-const tooltip = document.getElementById("tooltip");
+// Helper function to format ratio as percentage
+function formatRatioAsPercentage(ratio) {
+    return `${(ratio * 100).toFixed(0)}%`;
+}
 
-function appendPathToSVG(svgElement, pathData, fillColor, pathId) {
+function appendPathToSVG(svg, pathData, fillColor, pathId, tooltipName, ratio) {
+    const tooltip = document.getElementById(tooltipName);
+
     const newPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
     newPath.setAttribute("d", pathData);
     newPath.setAttribute("fill", fillColor);
-    newPath.setAttribute("id", pathId);
-    svgElement.appendChild(newPath);
+    newPath.setAttribute("id", pathId + "  -  " + formatRatioAsPercentage(ratio));
+    svg.appendChild(newPath);
 
     // Adding event listeners to the newly created path
     newPath.addEventListener("mouseenter", () => {
         tooltip.style.display = "block";
-        tooltip.textContent = newPath.id.split("/").pop();
+        tooltip.textContent = newPath.id.replace("/bahrain/bh-module/", "");
     });
-
     newPath.addEventListener("mousemove", (event) => {
-        // Calculate tooltip position relative to pieChartDiv
-        const pieChartRect = svgElement.getBoundingClientRect();
-        const tooltipX = event.clientX - pieChartRect.left;
-        const tooltipY = event.clientY - 250;
+        // Calculate tooltip position relative to the SVG container
+        const svgRect = svgElement.getBoundingClientRect(); // Get the bounding rectangle of the SVG
 
-        tooltip.style.left = `${tooltipX}px`;
-        tooltip.style.top = `${tooltipY + 10}px`; // Slight offset below the cursor
+        // Use the mouse position relative to the SVG's bounding box
+        const tooltipX = event.clientX - svgRect.left;
+        const tooltipY = event.clientY - svgRect.top + 150;
+
+        // Set tooltip position to follow the mouse cursor closely
+        tooltip.style.left = `${tooltipX}px`; // Adjusted to be within SVG bounds
+        tooltip.style.top = `${tooltipY}px`; // Adjusted to be within SVG bounds
+        tooltip.style.display = "block"; // Show the tooltip
     });
 
     newPath.addEventListener("mouseleave", () => {
-        tooltip.style.display = "none";
+        tooltip.style.display = "none"; // Hide the tooltip when the mouse leaves
     });
 }
 
@@ -383,7 +400,7 @@ function PieChart(slices) {
     // Loop through slices and append paths
     slices.forEach((slice) => {
         const pathData = calculatePieSlicePath(cx, cy, radius, startAngle, slice.ratio);
-        appendPathToSVG(svgElement, pathData, slice.color, slice.path);
+        appendPathToSVG(svgElement, pathData, slice.color, slice.path, "tooltip", slice.ratio);
         startAngle += slice.ratio * 360; // Update start angle for next slice
     });
 }
@@ -534,7 +551,7 @@ function createRadarChart(data, containerId) {
             text.setAttribute("text-anchor", "middle");
             text.setAttribute("fill", "white"); // White labels
             text.setAttribute("transform", `rotate(${rotationAngle}, ${labelX}, ${labelY})`); // Rotate text
-            text.textContent = labels[i];
+            text.textContent = labels[i].split("_").pop(); // Extract the last part of the type
             text.style.fontSize = "10px"; // Adjust font size as needed
             svg.appendChild(text);
         }
@@ -662,10 +679,126 @@ function UserXp(userTransactionQueryData) {
         xpElement.appendChild(projectSpan);
     });
 }
-
-
-document.getElementById('signOut').addEventListener('click', function () {
-        localStorage.removeItem('jwtToken');
-        window.location.href = 'index.html';
+document.getElementById("signOut").addEventListener("click", function () {
+    localStorage.removeItem("jwtToken");
+    window.location.href = "index.html";
 });
 
+function Projects(userTransactionQueryData) {
+    // Get the calculated data
+    const { totalXp, projectXp } = sumXpForSpecificPath(userTransactionQueryData);
+
+    // Check if projectXp is valid before proceeding
+    if (typeof projectXp !== "object" || projectXp === null) {
+        console.error("Expected an object but received:", typeof projectXp);
+        return;
+    }
+
+    // Generate slices and create a doughnut chart
+    const slices = generateSlices2(projectXp);
+    createDoughnutChart(slices);
+}
+
+// Function to calculate a doughnut chart path
+function calculateDoughnutSlicePath(cx, cy, outerRadius, innerRadius, startAngle, ratio) {
+    const endAngle = startAngle + ratio * 360;
+    const startOuterRad = (Math.PI / 180) * startAngle;
+    const endOuterRad = (Math.PI / 180) * endAngle;
+
+    const x1Outer = cx + outerRadius * Math.cos(startOuterRad);
+    const y1Outer = cy + outerRadius * Math.sin(startOuterRad);
+    const x2Outer = cx + outerRadius * Math.cos(endOuterRad);
+    const y2Outer = cy + outerRadius * Math.sin(endOuterRad);
+
+    const x1Inner = cx + innerRadius * Math.cos(endOuterRad);
+    const y1Inner = cy + innerRadius * Math.sin(endOuterRad);
+    const x2Inner = cx + innerRadius * Math.cos(startOuterRad);
+    const y2Inner = cy + innerRadius * Math.sin(startOuterRad);
+
+    const largeArcFlag = ratio > 0.5 ? 1 : 0;
+    const pathData = `
+        M ${x1Outer} ${y1Outer}
+        A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${x2Outer} ${y2Outer}
+        L ${x1Inner} ${y1Inner}
+        A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x2Inner} ${y2Inner}
+        Z
+    `;
+
+    return pathData;
+}
+
+function createDoughnutChart(slices) {
+    const DoughnutChart = document.getElementById("DoughnutChart");
+    if (!DoughnutChart) {
+        console.error("SVG element with id 'DoughnutChart' not found.");
+        return;
+    }
+
+    const cx = 0; // Center x
+    const cy = 0; // Center y
+    const outerRadius = 100; // Outer radius of the doughnut
+    const innerRadius = 50; // Inner radius of the doughnut
+    let startAngle = 0; // Starting angle in degrees
+
+    slices.forEach((slice) => {
+        const pathData = calculateDoughnutSlicePath(
+            cx,
+            cy,
+            outerRadius,
+            innerRadius,
+            startAngle,
+            slice.ratio
+        );
+        appendPathToSVG(DoughnutChart, pathData, slice.color, slice.path, "tooltip2", slice.ratio);
+        startAngle += slice.ratio * 360; // Update start angle for next slice
+    });
+}
+
+// Function to generate slices data from projectXp
+function generateSlices2(projectXp) {
+    const total = Object.values(projectXp).reduce((sum, value) => sum + value, 0);
+    const colorStops = ["#340979", "#00d4ff", "#050152"]; // Gradient color stops
+    const slices = [];
+
+    Object.entries(projectXp).forEach(([projectName, amount], index) => {
+        const ratio = amount / total;
+        const factor = index / (Object.keys(projectXp).length - 1);
+
+        const color1 = colorStops[Math.floor(factor * (colorStops.length - 1))];
+        const color2 = colorStops[Math.ceil(factor * (colorStops.length - 1))];
+        const colorFactor = (factor * (colorStops.length - 1)) % 1;
+        const color = interpolateColor(color1, color2, colorFactor);
+
+        slices.push({ path: projectName, ratio, color });
+    });
+    return slices;
+}
+
+function addTooltipToSvgElement(svgElement, tooltipElement) {
+    svgElement.addEventListener("mouseenter", () => {
+        tooltipElement.style.display = "block";
+    });
+
+    svgElement.addEventListener("mousemove", (event) => {
+        // Calculate tooltip position relative to the SVG container
+        const svgRect = svgElement.getBoundingClientRect(); // Get the bounding rectangle of the SVG
+
+        // Use the mouse position relative to the SVG's bounding box
+        const tooltipX = event.clientX - svgRect.left;
+        const tooltipY = event.clientY - svgRect.top + 200;
+
+        // Set tooltip position to follow the mouse cursor closely
+        tooltipElement.style.left = `${tooltipX}px`; // Adjusted to be within SVG bounds
+        tooltipElement.style.top = `${tooltipY}px`; // Adjusted to be within SVG bounds
+        tooltipElement.style.display = "block"; // Show the tooltip
+    });
+
+    svgElement.addEventListener("mouseleave", () => {
+        tooltipElement.style.display = "none"; // Hide the tooltip when the mouse leaves
+    });
+}
+
+// Usage example
+const svg2Element = document.getElementById("DoughnutChart");
+const tooltip2 = document.getElementById("tooltip2");
+addTooltipToSvgElement(svg2Element, tooltip2);

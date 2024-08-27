@@ -75,6 +75,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow: hidden;
 }
 
 .container {
@@ -84,12 +85,21 @@ body {
     justify-content: center;
     align-items: flex-start;
     /* gap: 20px; */
-    margin-top: 50px;
-    width: 80%;
+    margin-top: 40px;
+    width: 90%;
     overflow-y: auto;
     /* Color of the scrollbar thumb and track */
     /* Enable vertical scrolling */
     /* Adjusted to create space for the #logout div */
+}
+
+#DoughnutChartDev {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    /* Relative positioning to contain absolute positioning of the tooltip */
+    z-index: 5;
 }
 
 
@@ -132,7 +142,15 @@ body {
     /* Optional: Add margin to create space below the #logout div */
 }
 
-#logout:hover{
+.box6 {
+    height: 440px;
+}
+
+#DoughnutChart {
+    z-index: 10;
+}
+
+#logout:hover {
     cursor: pointer;
     text-decoration: underline;
 }
@@ -350,7 +368,6 @@ body {
 
 .profile #userName {
     margin-top: 5%;
-    color: white;
     font-size: 2em;
 }
 
@@ -411,22 +428,51 @@ body {
     /* Ensure the pie chart is above other elements */
 }
 
+
+/* Add this CSS to your stylesheet */
+
+
+/* Add this CSS to your stylesheet */
+
+
+/* Add this CSS to your stylesheet */
+
+
+/* Add this CSS to your stylesheet */
+
+.glow {
+    filter: drop-shadow(0 0 30px rgba(0, 58, 119, 0.9));
+}
+
 #tooltip {
     display: none;
     /* Hidden by default */
     position: absolute;
-    /* Align tooltip at the bottom of the pieChartDiv */
-    left: 50%;
-    /* Center the tooltip horizontally */
-    transform: translateX(-50%);
-    /* Center the tooltip with respect to its own width */
+    /* Allows positioning using left and top */
     font-size: 12px;
     color: aliceblue;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Background color for better visibility */
+    padding: 5px;
+    /* Padding around the text */
+    border-radius: 4px;
+    /* Rounded corners */
     z-index: 15;
     /* Ensure tooltip is above other elements */
     white-space: nowrap;
     /* Prevent the tooltip text from breaking into multiple lines */
-    height: auto;
+}
+
+#tooltip2 {
+    display: none;
+    position: absolute;
+    font-size: 12px;
+    color: aliceblue;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px;
+    border-radius: 4px;
+    z-index: 15;
+    white-space: nowrap;
 }
 
 .ratio {
@@ -491,14 +537,16 @@ body {
     /* Align text to the left */
 }
 
-#chartTitle {
+#chartTitle,
+#userName {
     font-size: 1.5em;
     margin-bottom: 10px;
-    color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), /* White glow */
     0 0 20px rgba(255, 255, 255, 0.6), /* Larger white glow */
     0 0 30px rgba(255, 255, 255, 0.4);
     /* Even larger white glow */
+    text-align: center;
+    /* Center the text */
 }
 
 #radarChartDiv {
