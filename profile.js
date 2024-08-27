@@ -161,7 +161,7 @@ async function start() {
         userId = user.id;
         const transactionUpData = await fetchData(userTransactionUpQuery);
         const progress = await fetchData(userProgressQuery);
-        const userData = await fetchData(userDetailsQuery);
+        const userData = await fetchData(userDetailsQuery, 2);
         const skills = await fetchData(userSkillsQuery);
         const stats = await fetchData(userStats);
         // const idk = await fetchData(objectQuery);
@@ -247,20 +247,34 @@ async function getUser() {
 /// end
 
 // to fetch the data
-async function fetchData(query) {
-    const variables = {userId};
+async function fetchData(query, type = 1) {
+    const variables = { userId };
+    var response;
     try {
-        const response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                query,
-                variables
-            }),
-        });
+        if (type === 1) {
+            response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    query,
+                }),
+            });
+        } else {
+            response = await fetch("https://learn.reboot01.com/api/graphql-engine/v1/graphql", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    query,
+                    variables
+                }),
+            });
+        }
 
         if (!response.ok) {
             throw new Error("Network response was not ok");
